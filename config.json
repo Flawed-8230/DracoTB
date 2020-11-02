@@ -1,6 +1,0 @@
-{
-    "prefix": "dr!",
-    "commands": ["pet"],
-    "AdminCommands": ["load", "unload", "reload", "restart", "eval", "status", "ban", "unban", "block", "unblock", "puke", "vore"],
-    "UserCommands": ["ping", "pet", "hug", "kiss", "nuzzle", "ilvv", "pat", "motd", "fuck", "insideofwyvern"]
-  }
