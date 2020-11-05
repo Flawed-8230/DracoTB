@@ -1,6 +1,6 @@
 const fetch = require('node-fetch')
 const { Webhook } = require('discord-webhook-node');
-const hook = new Webhook("https://discordapp.com/api/webhooks/773391498226040832/X38Ztfmxu1iG_ksIVVq43KSacarNMwO2ZxB8aUolSjXfr2vTrvSeYmora1UJ3l-9Jcne");
+const hook = new Webhook("this is a secret");
 const fs = require('fs');
 var tbheaders = require('trollbox-headers').headers()
 var io = require('socket.io-client')
