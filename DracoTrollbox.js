@@ -1,6 +1,6 @@
 const fetch = require('node-fetch')
 const { Webhook } = require('discord-webhook-node');
-const hook = new Webhook("this is a secret");
+const hook = new Webhook("still a secret");
 const fs = require('fs');
 var tbheaders = require('trollbox-headers').headers()
 var io = require('socket.io-client')
@@ -43,13 +43,13 @@ function send(msg) {
 
 const Adminhomes = config.Adminhomes
 const suggested = config.suggestion
+const blockedprefixes = config.blockedprefixes
 
 socket.on('message', data => {//on message
   let message = data.msg.toLowerCase().substr(0,80);
   let command = message.split(/ +/)[0].slice(config.prefix.length);
   let args = message.split(/ +/).splice(1);
-  let mainArg = args.join('');
-  let splitArgs = args.join(' ').substr(0,80);
+  let testargs = args.join(' ');
   let nick = data.nick.toLowerCase();
   let homes = data.home.toLowerCase(); 
   let capnicks = data.nick;
@@ -64,11 +64,11 @@ socket.on('message', data => {//on message
   if (message == 'pet draco') {pet(utils, message, args, data, homes);
   return utils.timer.set(homes, Date.now())};
 
-  //checks for command prefixes
+  //add commands here to do stuff, Case: "command name": commandfunctionname(); timeout code; break
   if (!message.startsWith(config.prefix)) return;
 
-  //this is our new security system to prevent intentional crashing of the bot
   let found = false
+
   bannedwords.forEach(word => {
     if(nick.includes(word)) found = true;
   });
@@ -76,9 +76,14 @@ socket.on('message', data => {//on message
   bannedwords.forEach(word => {
     if(message.includes(word)) found = true; 
   });
+
+  blockedprefixes.forEach(pref => {
+    if(testargs.includes(pref)) found = true; 
+  });
+
+
   if (found == true) return;
-    
-  //add commands here to do stuff, Case: "command name": commandfunctionname(); timeout code; break
+
     switch (command) {
       case 'help': send('[DracoBot Version 2.1.1] Help here: https://pastebin.com/0ap6RGds');
       utils.timer.set(homes, Date.now());
@@ -162,21 +167,21 @@ function vore(utils, message, args, data, homes) {
 
 function ban(utils, message, args, data, homes) {
   if (!Adminhomes.includes(homes)) return;
-  send(`${data.nick} (${args}) has been banned`)
+  send(`(${args}) has been banned`)
   utils.banned.push(args);
   saveBanStuff();
 }
 
 function puke(utils, message, args, data, homes) {
   if (!Adminhomes.includes(homes)) return;
-  send(`Wyvern spit ${data.nick} out, UwU`)
+  send(`Wyvern spit ${args} out, UwU`)
   utils.insideofdragon.splice(utils.insideofdragon.indexOf(args),1);
   saveDedStuff();
 }
 
 function unban(utils, message, args, data, homes) {
   if (!Adminhomes.includes(homes)) return;
-  send(`${data.nick} (${args}) has been unbanned`);
+  send(`(${args}) has been unbanned`);
   utils.banned.splice(utils.banned.indexOf(args),1);
   saveBanStuff();
 }
