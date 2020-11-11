@@ -1,6 +1,15 @@
+const TOKEN = "seekret"
+
+const Discord = require("discord.js");
+
+const bot = new Discord.Client();
+
 const fetch = require('node-fetch')
 const { Webhook } = require('discord-webhook-node');
-const hook = new Webhook("still a secret");
+
+const suggesthook = new Webhook("put your suggestion webhook link here");
+const gatehook = new Webhook("gateway link here");
+
 const fs = require('fs');
 var tbheaders = require('trollbox-headers').headers()
 var io = require('socket.io-client')
@@ -85,7 +94,7 @@ socket.on('message', data => {//on message
   if (found == true) return;
 
     switch (command) {
-      case 'help': send('[DracoBot Version 2.1.1] Help here: https://pastebin.com/0ap6RGds');
+      case 'help': send('[DracoBot Version 2.0.0] Help here: https://pastebin.com/0ap6RGds');
       utils.timer.set(homes, Date.now());
         break;
       case 'pet': pet(utils, message, args, data, homes);
@@ -142,7 +151,10 @@ socket.on('message', data => {//on message
       case 'say': say(utils, message, args, data, homes);
       utils.timer.set(homes, Date.now());
           break;
-    };
+      case 'gate': gate(utils, message, args, data, homes);
+      utils.htimer.set(homes, Date.now());
+          break;
+      };
 });
 //console users moment
 //socket.on('update users',n=>console.log(n));
@@ -160,6 +172,7 @@ function pat(utils, message, args, data, homes) {
 
 function vore(utils, message, args, data, homes) {
   if (!Adminhomes.includes(homes)) return;
+  if (utils.insideofdragon.includes(args)) return send(`${args} is already inside of you, Wyvern.`);
   send(`Wyvern swallows ${args} whole, mmmm~`)
   utils.insideofdragon.push(args);
   saveDedStuff();
@@ -174,6 +187,7 @@ function ban(utils, message, args, data, homes) {
 
 function puke(utils, message, args, data, homes) {
   if (!Adminhomes.includes(homes)) return;
+  if (!utils.insideofdragon.includes(args)) return send(`${args} isnt inside of you, Wyvern.`);
   send(`Wyvern spit ${args} out, UwU`)
   utils.insideofdragon.splice(utils.insideofdragon.indexOf(args),1);
   saveDedStuff();
@@ -252,12 +266,37 @@ function suggest(utils, message, args, data, homes) {
   let CooldowntimeH = (Date.now() - heavycd) / 1000
   if (Date.now() - heavycd <= 60000) {send(`you have ${CooldowntimeH} Seconds Left before you can suggest again`); utils.timer.set(homes, Date.now()); return};
   send(suggested[utils.random(0, suggested.length - 1)]);
-  hook.send(args.join(" "))
+  suggesthook.send(args.join(" "))
 }
+
+function gate(utils, message, args, data, homes) {
+  let heavycd = utils.htimer.get(homes);
+  if (Date.now() - heavycd <= 20000) return
+  gatehook.send(`${data.nick}:  ${args.join(" ")}`)
+}
+
 
 function say(utils, message, args, data, homes) {
   send(args.join(" "));
 }
 
 
-//
+//discord bot section uwu
+bot.on("message", msg => {
+  if (msg.author.bot) return;
+
+  let cooldowns2 = utils.timer.get(msg.author.id);
+
+  if (Date.now() - cooldowns2 <= 2500) return;
+  
+  if (utils.banned.includes(msg.author.id)) return;
+
+  if (!msg.content.startsWith(config.prefix)) return;
+
+  if (utils.banned.includes(msg.author.id)) return;
+    
+  if (msg.content.startsWith('dr!send')) socket.emit('message',`${msg.author.username}: ${msg.content.split(/ +/).splice(1)}`)
+  utils.timer.set(msg.author.id, Date.now());
+});
+
+bot.login(TOKEN);
